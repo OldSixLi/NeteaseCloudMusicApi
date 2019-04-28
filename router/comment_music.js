@@ -18,4 +18,4 @@ module.exports = (req, res, createWebAPIRequest, request) => {
     },
     err => res.status(502).send(err.message)
   );
-};
+}; 

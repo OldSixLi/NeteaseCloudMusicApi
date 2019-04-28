@@ -6,8 +6,8 @@ console.log("注意:测试登陆需要替换这里的账号密码!!!");
 
 describe("测试登录是否正常", () => {
   it("手机登录 code 应该等于200", done => {
-    const phone = "换成你的手机号";
-    const password = "换成你的密码";
+    const phone = "18222603560";
+    const password = "ma1136191854.";
     let cookie = "";
     const md5sum = crypto.createHash("md5");
     md5sum.update(password);
@@ -24,6 +24,10 @@ describe("测试登录是否正常", () => {
       data,
       cookie,
       (music_req, cookie) => {
+
+        console.log("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+        console.log("执行登陆测试");
+        console.log("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
         const result = JSON.parse(music_req);
         console.log({
           loginType: result.loginType,

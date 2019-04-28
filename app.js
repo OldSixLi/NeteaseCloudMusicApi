@@ -6,7 +6,7 @@ const app = express();
 let cache = apicache.middleware;
 
 // 跨域设置
-app.all("*", function(req, res, next) {
+app.all("*", function (req, res, next) {
   if (req.path !== "/" && !req.path.includes(".")) {
     res.header("Access-Control-Allow-Credentials", true);
     // 这里获取 origin 请求头 而不是用 *
@@ -24,7 +24,7 @@ app.use(cache("2 minutes", onlyStatus200));
 
 app.use(express.static(path.resolve(__dirname, "public")));
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   const proxy = req.query.proxy;
   if (proxy) {
     req.headers.cookie = req.headers.cookie + `__proxy__${proxy}`;
@@ -47,8 +47,11 @@ const Wrap = fn => (req, res) => fn(req, res, createWebAPIRequest, request);
 // 同步读取 router 目录中的js文件, 根据命名规则, 自动注册路由
 fs.readdirSync("./router/").forEach(file => {
   if (/\.js$/i.test(file) === false) {
+    console.log("false File:", file);
     return;
   }
+
+  // console.log("file:", file);
 
   let route;
 
@@ -63,12 +66,14 @@ fs.readdirSync("./router/").forEach(file => {
         .replace(/[A-Z]/g, a => {
           return "/" + a.toLowerCase();
         });
+
+    console.log(route, '---', file);
   }
 
   app.use(route, Wrap(require("./router/" + file)));
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 9999;
 
 app.listen(port, () => {
   console.log(`server running @ http://localhost:${port}`);
