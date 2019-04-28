@@ -57,7 +57,7 @@ function createWebAPIRequest(
       "Content-Type": "application/x-www-form-urlencoded",
       Referer: "http://music.163.com",
       Host: "music.163.com",
-      Cookie: cookie,
+      Cookie: `usertrack=ezq0pFyE5Rw6r0z6FC4xAg==; __guid=94650624.2540891950219387000.1556433247780.4429; JSESSIONID-WYYY=OtHzRmSUpyMiE5d7QZnGMvxPYrW49RYFV6d%5CsxwB094c%2B%2BN3rjdO5K%2FaJeUXNx32%5C0%2Fa0xcUEqXPzyEyDllYjeVwOiYjwjS9Relw%5CooPE9OR5wd4nuBfXqxWUDwmIWaNsA%2FKGON4MlPbjsRPToqd4Jbwnad6azojrFFUbhOoGoMNcpzK%3A1556435049191; _iuqxldmzr_=32; _ntes_nnid=bec7259a7ede9413a42f41d9df66f1bf,1556433249264; _ntes_nuid=bec7259a7ede9413a42f41d9df66f1bf; WM_NI=9PtzeFaDQ8vb4lNMys0N56lzF9QAHOFG5DvkUntGFrCzRO%2BpkzcAccy7Ohkr96lxlweh5uCAc83H0zuedRooLJeIp0zpKqecyu5JHWP5YvDkYFKIIeTWWKEIdbgoZpsKWDc%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6eeadd05ef4a89fadf045adb48aa6c55a839b8abbf27295b983d4c27390bcffbadc2af0fea7c3b92afb90bc9be84ea39c9fd9f56af8b482aefc79f492fbd7ef7286e79fa2cb458699fba5f56197b2bca8c57a81a69eb0aa7ca9a6ada2e269bbe98189ea7afbeaa499ef7da7b8fb96c24ba1e8fda9b372b7bbacb3ee659096abaaf33cbab08592e869bbabfbabcb5d94eb9797c7619b9a85aacc6f988999acc843a8bea990d97cb19599a5e237e2a3; WM_TID=%2BysG4j5sht5AVFQFAFMpnGxI3CmedgYc; monitor_count=2`,
       "User-Agent": randomUserAgent()
     },
     body: querystring.stringify({
