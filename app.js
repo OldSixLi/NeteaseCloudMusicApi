@@ -6,24 +6,12 @@ const request = require('./util/request')
 const package = require('./package.json')
 const exec = require('child_process').exec
 const cache = require('apicache').middleware
-
-// 跨域设置
-app.all("*", function (req, res, next) {
-  if (req.path !== "/" && !req.path.includes(".")) {
-    res.header("Access-Control-Allow-Credentials", true);
-    // 这里获取 origin 请求头 而不是用 *
-    res.header("Access-Control-Allow-Origin", req.headers["origin"] || "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-    res.header("Content-Type", "application/json;charset=utf-8");
-  }
-  next();
-});
+const userRouter = require('./router/custom');
 // version check
 exec('npm info NeteaseCloudMusicApi version', (err, stdout, stderr) => {
-    if(!err){
+    if (!err) {
         let version = stdout.trim()
-        if(package.version < version){
+        if (package.version < version) {
             console.log(`最新版本: ${version}, 当前版本: ${package.version}, 请及时更新`)
         }
     }
@@ -31,9 +19,10 @@ exec('npm info NeteaseCloudMusicApi version', (err, stdout, stderr) => {
 
 const app = express()
 
+
 // CORS
 app.use((req, res, next) => {
-    if(req.path !== '/' && !req.path.includes('.')){
+    if (req.path !== '/' && !req.path.includes('.')) {
         res.header({
             'Access-Control-Allow-Credentials': true,
             'Access-Control-Allow-Origin': req.headers.origin || '*',
@@ -49,7 +38,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     req.cookies = {}, (req.headers.cookie || '').split(/\s*;\s*/).forEach(pair => {
         let crack = pair.indexOf('=')
-        if(crack < 1 || crack == pair.length - 1) return
+        if (crack < 1 || crack == pair.length - 1) return
         req.cookies[decodeURIComponent(pair.slice(0, crack)).trim()] = decodeURIComponent(pair.slice(crack + 1)).trim()
     })
     next()
@@ -57,7 +46,7 @@ app.use((req, res, next) => {
 
 // body parser
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.urlencoded({ extended: false }))
 
 // cache
 app.use(cache('2 minutes', ((req, res) => res.statusCode === 200)))
@@ -73,31 +62,33 @@ const special = {
 }
 
 fs.readdirSync(path.join(__dirname, 'module')).reverse().forEach(file => {
-    if(!(/\.js$/i.test(file))) return
+    if (!(/\.js$/i.test(file))) return
     let route = (file in special) ? special[file] : '/' + file.replace(/\.js$/i, '').replace(/_/g, '/')
     let question = require(path.join(__dirname, 'module', file))
-    
+
     app.use(route, (req, res) => {
-        let query = Object.assign({}, req.query, req.body, {cookie: req.cookies})
+        let query = Object.assign({}, req.query, req.body, { cookie: req.cookies })
         question(query, request)
-        .then(answer => {
-            console.log('[OK]', decodeURIComponent(req.originalUrl))
-            res.append('Set-Cookie', answer.cookie)
-            res.status(answer.status).send(answer.body)
-        })
-        .catch(answer => {
-            console.log('[ERR]', decodeURIComponent(req.originalUrl))
-            if(answer.body.code =='301') answer.body.msg = '需要登录'
-            res.append('Set-Cookie', answer.cookie)
-            res.status(answer.status).send(answer.body)
-        })
+            .then(answer => {
+                console.log('[OK]', decodeURIComponent(req.originalUrl))
+                res.append('Set-Cookie', answer.cookie)
+                res.status(answer.status).send(answer.body)
+            })
+            .catch(answer => {
+                console.log('[ERR]', decodeURIComponent(req.originalUrl))
+                if (answer.body.code == '301') answer.body.msg = '需要登录'
+                res.append('Set-Cookie', answer.cookie)
+                res.status(answer.status).send(answer.body)
+            })
     })
 })
 
+app.use('/ma', userRouter);
+
 const port = process.env.PORT || 9999
 
-app.server = app.listen(port, () => {
-    console.log(`server running @ http://localhost:${port}`)
+app.server = app.listen(port, '0.0.0.0', () => {
+    console.log(`server running @ http://0.0.0.0:${port}`)
 })
 
 module.exports = app

@@ -51,6 +51,25 @@ const createRequest = (method, url, data, options) => {
         .join('; ')
     else if (options.cookie) headers['Cookie'] = options.cookie
 
+
+    let _csrfList = [
+      'b098d92ea6dc4eba432c66fff8fdc014',
+      'b098d92ea6dc4ebaebbttr2fff8fdc14',
+      'b098d92ea6dc4ebeeec66fff83fdc014',
+      'b098d92ea6asebaebbc66f3ff8fdc014',
+      'b098d92ea6dc4ebaebbc66eff8fdc064',
+      'b098d9vea6dc4ebaebbc66fff8fdc064',
+      'b098d92ea6dc4lofebbc66fff8fdc014',
+      'b098d92ea6dbnjbaebbc66fff8fdc014']
+
+    // dffe743c5850f74bfcfc2c4c25360991985c48ec69b488a5ea33d9e47467248df3822965d820fa4222cdbd1acc3f5aa9bc719b33bb4f842b
+    // dffe743c5850f74bfcfc2c4c25360991765683db47d91164daa09e7639b146ad6934967c68462e0b93df524f7ae6fa128fd28a8d65b08553
+    // dffe743c5850f74bfcfc2c4c25360991765683db47d91164daa09e7639b146ad6934967c68462e0b93df524f7ae6fa128fd28a8d65b08553
+    // dffe743c5850f74bfcfc2c4c25360991765683db47d91164daa09e7639b146ad6934967c68462e0b93df524f7ae6fa128fd28a8d65b08553
+
+
+    // dffe743c5850f74bfcfc2c4c2536099119607d5eacb9ee5a37940f0897f023d6aa3dfc43eea21e98b2e42a914071f23a8fd28a8d65b08553
+    // headers['Cookie']+=`_ga=GA1.1.511944046.1553217272; __remember_me=true; __csrf=${_csrfList[Math.round(Math.random()*8)]}; MUSIC_U=dffe743c5850f74bfcfc2c4c25360991e25a3c17ff8efa6d4fde7730af0960beb2e430ddc435079346192c4cf17a85482fc08813370fb503`;
     if (options.crypto == 'weapi') {
       let csrfToken = (headers['Cookie'] || '').match(/_csrf=([^(;|$)]+)/)
       data.csrf_token = csrfToken ? csrfToken[1] : ''
