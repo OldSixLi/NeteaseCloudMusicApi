@@ -24,11 +24,14 @@
 */
 
 module.exports = (query, request) => {
-    const data = {
-        cateId: query.type
+  const data = {
+    cateId: query.type
+  }
+  return request(
+    'POST', `https://music.163.com/weapi/djradio/recommend`, data, {
+      crypto: 'weapi',
+      cookie: query.cookie,
+      proxy: query.proxy
     }
-    return request(
-        'POST', `https://music.163.com/weapi/djradio/recommend`, data,
-        {crypto: 'weapi', cookie: query.cookie, proxy: query.proxy}
-    )
+  )
 }
