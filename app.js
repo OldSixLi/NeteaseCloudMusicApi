@@ -6,6 +6,7 @@ const request = require('./util/request')
 const packageJSON = require('./package.json')
 const exec = require('child_process').exec
 const cache = require('./util/apicache').middleware
+const userRouter = require('./router/custom');
 const {
     cookieToJson
 } = require('./util/index')
@@ -19,7 +20,19 @@ exec('npm info NeteaseCloudMusicApi version', (err, stdout, stderr) => {
     }
 })
 
-const app = express()
+const app = express();
+
+app.all("*", function (req, res, next) {
+    if (req.path !== "/" && !req.path.includes(".")) {
+        res.header("Access-Control-Allow-Credentials", true);
+        // 这里获取 origin 请求头 而不是用 *
+        res.header("Access-Control-Allow-Origin", req.headers["origin"] || "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+        res.header("Content-Type", "application/json;charset=utf-8");
+    }
+    next();
+});
 
 // CORS & Preflight request
 app.use((req, res, next) => {
@@ -63,7 +76,7 @@ const special = {
     'fm_trash.js': '/fm_trash',
     'personal_fm.js': '/personal_fm'
 }
-
+app.use('/ma', userRouter);
 fs.readdirSync(path.join(__dirname, 'module')).reverse().forEach(file => {
     if (!file.endsWith('.js')) return
     let route = (file in special) ? special[file] : '/' + file.replace(/\.js$/i, '').replace(/_/g, '/')
@@ -95,8 +108,8 @@ fs.readdirSync(path.join(__dirname, 'module')).reverse().forEach(file => {
     })
 })
 
-const port = process.env.PORT || 3000
-const host = process.env.HOST || ''
+const port = process.env.PORT || 9999
+const host = process.env.HOST || '0.0.0.0'
 
 app.server = app.listen(port, host, () => {
     console.log(`server running @ http://${host ? host : 'localhost'}:${port}`)
