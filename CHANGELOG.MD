@@ -1,4 +1,14 @@
 # 更新日志
+### 3.34.1 | 2020.07.06
+- 登录接口增加 `md5_password` 参数 [#839](https://github.com/Binaryify/NeteaseCloudMusicApi/issues/839)
+
+### 3.34.0 | 2020.06.25
+- 排行榜接口废弃idx参数,只支持id参数,修复返回数据异常问题 [#830](https://github.com/Binaryify/NeteaseCloudMusicApi/issues/830)
+- 新增`获取历史日推可用日期列表`,`获取历史日推详细数据` 接口
+
+### 3.33.2 | 2020.06.23
+- 更新每日推荐接口 [#826](https://github.com/Binaryify/NeteaseCloudMusicApi/issues/826)
+
 ### 3.33.1 | 2020.06.15
 - 修复直接调用时传入 cookie 不生效的问题 [#822](https://github.com/Binaryify/NeteaseCloudMusicApi/issues/822)
 

@@ -169,6 +169,8 @@
 151. 获取推荐视频
 152. 获取视频分类列表 
 153. 获取全部视频列表接口
+154. 获取历史日推可用日期列表
+155. 获取历史日推详细数据
 
 ## 安装
 
@@ -327,11 +329,16 @@ $ sudo docker run -d -p 3000:3000 netease-music-api
 
 `password`: 密码
 
+
+
+**可选参数 :**   
+`countrycode`: 国家码，用于国外手机号登陆，例如美国传入：`1`
+
+`md5_password`: md5加密后的密码,传入后 `password` 将失效  
+
 **接口地址 :** `/login/cellphone`
 
-**可选参数 :** `countrycode`: 国家码，用于国外手机号登陆，例如美国传入：`1`
-
-**调用例子 :** `/login/cellphone?phone=xxx&password=yyy`
+**调用例子 :** `/login/cellphone?phone=xxx&password=yyy` `/login/cellphone?phone=xxx&md5_password=yyy`
 
 #### 2. 邮箱登录
 
@@ -340,6 +347,10 @@ $ sudo docker run -d -p 3000:3000 netease-music-api
 `email`: 163 网易邮箱   
 
 `password`: 密码
+
+**可选参数 :**  
+
+`md5_password`: md5加密后的密码,传入后 `password` 将失效
 
 **接口地址 :** `/login`
 
@@ -798,8 +809,6 @@ tags: 歌单标签
 
 说明 : 调用此接口,可获取歌手分类列表  
 
-**必选参数 :** `cat` : 即 category Code,歌手类型,默认 1001,返回华语男歌手数据  
-
 **可选参数 :**
 
 `limit` : 返回数量 , 默认为 30
@@ -930,7 +939,7 @@ tags: 歌单标签
 `cat`:`cat`: tag, 比如 " 华语 "、" 古风 " 、" 欧美 "、" 流行 ", 默认为
 "全部",可从歌单分类接口获取(/playlist/catlist)  
 
-`limit`: 取出评论数量 , 默认为 50
+`limit`: 取出歌单数量 , 默认为 50
 
 `offset`: 偏移数量 , 用于分页 , 如 :( 评论页数 -1)\*50, 其中 50 为 limit 的值
 
@@ -1672,6 +1681,24 @@ mp3url 不能直接用 , 可通过 `/song/url` 接口传入歌曲 id 获取具�
 返回数据如下图 :
 ![每日推荐歌曲](https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/static/%E6%8E%A8%E8%8D%90%E6%AD%8C%E6%9B%B2.png)
 
+### 获取历史日推可用日期列表
+
+说明 : 调用此接口 , 可获得历史日推可用日期列表  
+
+**接口地址 :** `/history/recommend/songs`
+
+**调用例子 :** `/history/recommend/songs`
+
+### 获取历史日推详情数据
+
+说明 : 调用此接口 ,传入当日日期, 可获得当日历史日推数据  
+
+**必选参数 :** `date`: 日期,通过历史日推可用日期列表接口获取,不能任意日期
+
+**接口地址 :** `/history/recommend/songs/detail`
+
+**调用例子 :** `/history/recommend/songs/detail?date=2020-06-21`
+
 ### 私人 FM
 
 说明 : 私人 FM( 需要登录 )
@@ -2046,92 +2073,6 @@ MV 点赞转发评论数数据
 **调用例子 :** `/video/url?id=89ADDE33C0AAE8EC14B99F6750DB954D`
 
 
-### 排行榜
-
-说明 : 调用此接口 , 传入数字 idx, 可获取不同排行榜
-
-**必选参数 :** `idx`: 对象 key, 对应以下排行榜
-
-```
-"0": 云音乐新歌榜,
-
-"1": 云音乐热歌榜,
-
-"2": 网易原创歌曲榜,
-
-"3": 云音乐飙升榜,
-
-"4": 云音乐电音榜,
-
-"5": UK排行榜周榜,
-
-"6": 美国Billboard周榜
-
-"7": KTV嗨榜,
-
-"8": iTunes榜,
-
-"9": Hit FM Top榜,
-
-"10": 日本Oricon周榜
-
-"11": 韩国Melon排行榜周榜,
-
-"12": 韩国Mnet排行榜周榜,
-
-"13": 韩国Melon原声周榜,
-
-"14": 中国TOP排行榜(港台榜),
-
-"15": 中国TOP排行榜(内地榜)
-
-"16": 香港电台中文歌曲龙虎榜,
-
-"17": 华语金曲榜,
-
-"18": 中国嘻哈榜,
-
-"19": 法国 NRJ EuroHot 30周榜,
-
-"20": 台湾Hito排行榜,
-
-"21": Beatport全球电子舞曲榜,
-
-"22": 云音乐ACG音乐榜,
-
-"23": 云音乐说唱榜
-
-"24": 云音乐古典音乐榜
-
-"25": 云音乐电音榜
-
-"26": 抖音排行榜
-
-"27": 新声榜
-
-"28": 云音乐韩语榜
-
-"29": 英国Q杂志中文版周榜
-
-"30": 电竞音乐榜
-
-"31": 云音乐欧美热歌榜
-
-"32": 云音乐欧美新歌榜
-
-"33": 说唱TOP榜
-
-```
-**可选参数 :** `id`: 榜单id,传入后idx将失效
-
-**接口地址 :** `/top/list`
-
-**调用例子 :** `/top/list?idx=6`,`/top/list?id=2809577409`
-
-返回数据如下图 :
-
-![排行榜](https://raw.githubusercontent.com/Binaryify/NeteaseCloudMusicApi/master/static/top_list.png)
-
 ### 所有榜单
 
 说明 : 调用此接口,可获取所有榜单
@@ -2139,9 +2080,22 @@ MV 点赞转发评论数数据
 
 **调用例子 :** `/toplist`
 
+### 排行榜详情
+说明: 请使用[歌单详情](#获取歌单详情)接口,传入排行榜id获取排行榜详情数据(排行榜也是歌单的一种)
+
+~~说明 : 调用此接口 , 传入榜单 id, 可获取不同排行榜数据(v3.34.0之后不再支持idx参数)~~
+
+~~**必选参数 :** `id`: 榜单id,通过所有榜单接口获取~~
+
+~~**接口地址 :** `/top/list`~~
+
+~~**调用例子 :** `/top/list?id=2809577409`~~
+
+
 ### 所有榜单内容摘要
 
-说明 : 调用此接口,可获取所有榜单内容摘要
+说明 : 调用此接口,可获取所有榜单内容摘要  
+
 **接口地址 :** `/toplist/detail`
 
 **调用例子 :** `/toplist/detail`
