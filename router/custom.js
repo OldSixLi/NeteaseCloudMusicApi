@@ -1,11 +1,13 @@
-const express = require('express');
-let router = express.Router();
-const crypto = require('crypto');
+const express = require('express')
+let router = express.Router()
+const crypto = require('crypto')
 const request = require('./../util/request');
 // 获取歌曲评论
 let _getMusicComment = require('./../module/comment_music');
 // 获取歌单详情
 let _getPlayListDetail = require('./../module/playlist_detail');
+let _getSongDetail = require('./../module/song_detail');
+
 
 /*
 '########:::'#######::'##::::'##:'########:'########:'########::
@@ -19,7 +21,7 @@ let _getPlayListDetail = require('./../module/playlist_detail');
 */
 
 /**
- * 获取某个歌曲的评论量 
+ * 获取某个歌曲的评论量
  * @returns 
  */
 router.all('/comment/music', (req, res) => {
@@ -40,6 +42,9 @@ router.all('/comment/music', (req, res) => {
 router.all('/playlist/detail', (req, res) => {
     let query = Object.assign({}, req.query, req.body, { cookie: req.cookies })
     _getPlayListDetail(query, request).then(async resResult => {
+        console.log("■■■■■■■■■resResult■■■■■■■■■■■■■■■■■■");
+        console.log(resResult);
+        console.log("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
         let result = {};
         try {
             result = await handleMusicList(resResult, req);
@@ -78,30 +83,78 @@ router.all('/playlist/detail', (req, res) => {
  * @returns
  */
 async function handleMusicList(musicListRes, req) {
-    let beforeMusicListArr = (musicListRes.body.playlist && musicListRes.body.playlist.tracks) || [];
+    // 拿到所有歌曲ID
+    // [{
+    //     "id": 1804879213,
+    //     "v": 4,
+    //     "at": 1608866951370,
+    //     "alg": null
+    // }
+    // ...]
+    let beforeMusicListArr = (musicListRes.body.playlist && musicListRes.body.playlist.trackIds) || [];
+
+
     // 处理后的歌单列表
     let afterMusicListArr = [];
     return new Promise(async resolve => {
         // 先获取到所有歌曲的评论量
-        let musicsComment = {};
+        let musicsComment, musicsDetail;
         try {
             musicsComment = await getMusicListComment(100, beforeMusicListArr, req);
+            musicsDetail = await getMusicListDetails(beforeMusicListArr, req);
         } catch (error) {
             console.log(error);
         }
         for (let index = 0; index < beforeMusicListArr.length; index++) {
             const x = beforeMusicListArr[index];
+            let musicDetailObj = musicsDetail.get(x.id);
             let musicObj = {
-                name: x.name,
-                author: x && x.ar && x.ar[0] && x.ar[0].name || "",
+                // name: x.name,
+                // author: x && x.ar && x.ar[0] && x.ar[0].name || "",
                 id: x.id,
-                al: x.al,
-                commentNum: musicsComment.get(x.id) || 0
+                // al: x.al,
+                commentNum: musicsComment.get(x.id) || 0,
+                ...musicDetailObj
             };
             afterMusicListArr.push(musicObj);
         }
         resolve({ name: musicListRes.body.playlist.name, id: musicListRes.body.playlist.name, musicList: afterMusicListArr });
     }).catch(error => console.log('caught', error));
+}
+
+/**
+ *
+ *
+ */
+function getMusicListDetails(musicIdsArr, req) {
+    // 拿到musicIds数组
+    let ids = musicIdsArr.reduce((a, b) => a.concat(b.id), [])
+    req.query.ids = ids.join(',');
+    let query = Object.assign({}, req.query, req.body, { cookie: req.cookies });
+    query.cookie._ntes_nuid = crypto.randomBytes(16).toString("hex");
+    let musicDetails = new Map();
+    //返回一个promise对象才可以调用then等函数
+    return new Promise(function (resolve, reject) {
+        _getSongDetail(query, request).then(
+            res => {
+                let data = res.body && res.body.songs;
+                if (data.length > 0) {
+                    data.forEach(x => {
+                        let obj = {
+                            name: x.name,
+                            author: (x && x.ar && x.ar[0] && x.ar[0].name) || "",
+                            al: x.al
+                        }
+                        musicDetails.set(x.id, obj);
+                    })
+                }
+                resolve(musicDetails);
+            },
+            err => {
+                resolve(musicDetails);
+            }
+        )
+    });
 }
 
 /**
@@ -123,12 +176,12 @@ function getMusicListComment(num, musicArr, req) {
                     arr.push(getComment(obj.id, req));
                 }
             }
-
             //循环执行
             try {
                 await Promise.all(arr).then(data => {
                     data.forEach(x => {
-                        // Object.assign(musicsCommentNum, x);
+                        // 设置每首歌的评论量
+                        // {id:number}
                         musicsCommentMap.set(x[0], x[1]);
                     })
                 }, err => console.log(err)).catch(error => console.log('caught', error));

@@ -1,5 +1,5 @@
 module.exports = {
-  root: true,
+  root: false,
   parserOptions: {
     parser: 'babel-eslint',
     ecmaVersion: 2018,
@@ -8,8 +8,8 @@ module.exports = {
   plugins: ['html'],
   extends: ['plugin:prettier/recommended'],
   env: {
-    browser: true,
-    node: true,
+    browser: false,
+    node: false,
   },
 
   rules: {
