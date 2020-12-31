@@ -2,10 +2,14 @@
 
 module.exports = (query, request) => {
   return request(
-    'POST', `https://music.163.com/api/toplist`, {}, {
+    'POST',
+    `https://music.163.com/api/toplist`,
+    {},
+    {
       crypto: 'linuxapi',
       cookie: query.cookie,
-      proxy: query.proxy
-    }
+      proxy: query.proxy,
+      realIP: query.realIP,
+    },
   )
 }
