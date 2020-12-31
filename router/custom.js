@@ -109,6 +109,7 @@ async function handleMusicList(musicListRes, req) {
             const x = beforeMusicListArr[index];
             let musicDetailObj = musicsDetail.get(x.id);
             let musicObj = {
+                'by':'OldsixLi',
                 // name: x.name,
                 // author: x && x.ar && x.ar[0] && x.ar[0].name || "",
                 id: x.id,
