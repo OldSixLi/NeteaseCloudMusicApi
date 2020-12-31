@@ -124,7 +124,7 @@ async function handleMusicList(musicListRes, req) {
 }
 
 /**
- *
+ * 获取所有歌曲的详情 by ids
  *
  */
 function getMusicListDetails(musicIdsArr, req) {
