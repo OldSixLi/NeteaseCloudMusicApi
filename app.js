@@ -26,7 +26,7 @@ app.all("*", function (req, res, next) {
     if (req.path !== "/" && !req.path.includes(".")) {
         res.header("Access-Control-Allow-Credentials", true);
         // 这里获取 origin 请求头 而不是用 *
-        res.header("Access-Control-Allow-Origin", req.headers["origin"] || "*");
+      res.header("Access-Control-Allow-Origin", req.headers["origin"] || req.headers["Origin"] || "*");
         res.header("Access-Control-Allow-Headers", "X-Requested-With");
         res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
         res.header("Content-Type", "application/json;charset=utf-8");
