@@ -1,13 +1,17 @@
-// 云村热评
+// 初始化名字
 
 module.exports = (query, request) => {
-  const data = {}
+  const data = {
+    id: query.id,
+    n: 100000,
+    s: query.s || 8,
+  }
   return request(
     'POST',
-    `https://music.163.com/api/comment/hotwall/list/get`,
+    `https://music.163.com/api/playlist/detail/dynamic`,
     data,
     {
-      crypto: 'weapi',
+      crypto: 'api',
       cookie: query.cookie,
       proxy: query.proxy,
       realIP: query.realIP,

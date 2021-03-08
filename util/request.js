@@ -112,12 +112,8 @@ const createRequest = (method, url, data, options) => {
       url = url.replace(/\w*api/, 'eapi')
     }
 
-    const answer = {
-      status: 500,
-      body: {},
-      cookie: []
-    }
-    const settings = {
+    const answer = { status: 500, body: {}, cookie: [] }
+    let settings = {
       method: method,
       url: url,
       headers: headers,
@@ -149,7 +145,12 @@ const createRequest = (method, url, data, options) => {
         }
       }
     }
-
+    if (options.crypto === 'eapi') {
+      settings = {
+        ...settings,
+        responseType: 'arraybuffer',
+      }
+    }
     axios(settings)
       .then((res) => {
         const body = res.data
@@ -157,12 +158,22 @@ const createRequest = (method, url, data, options) => {
           x.replace(/\s*Domain=[^(;|$)]+;*/, ''),
         )
         try {
-          answer.body = body
+          if (options.crypto === 'eapi') {
+            answer.body = JSON.parse(encrypt.decrypt(body).toString())
+          } else {
+            answer.body = body
+          }
+
           answer.status = answer.body.code || res.status
-          if (answer.body.code === 502) {
+          if (
+            [201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body.code) >
+            -1
+          ) {
+            // 特殊状态码
             answer.status = 200
           }
         } catch (e) {
+          // console.log(e)
           answer.body = body
           answer.status = res.status
         }
