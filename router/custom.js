@@ -139,7 +139,7 @@ function getMusicListDetails(musicIdsArr, req) {
         _getSongDetail(query, request).then(
             res => {
                 let data = res.body && res.body.songs;
-                if (data.length > 0) {
+                if (data && data.length > 0) {
                     data.forEach(x => {
                         let obj = {
                             name: x.name,
