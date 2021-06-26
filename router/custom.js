@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const request = require('./../util/request');
 // 获取歌曲评论
 let _getMusicComment = require('./../module/comment_music');
+let _getMusicCommentNew = require('./../module/comment_new');
 // 获取歌单详情
 let _getPlayListDetail = require('./../module/playlist_detail');
 let _getSongDetail = require('./../module/song_detail');
@@ -169,7 +170,11 @@ function getMusicListDetails(musicIdsArr, req) {
 function getMusicListComment(num, musicArr, req) {
     return new Promise(async resolve => {
         let musicsCommentMap = new Map();
+        let maxNum = musicArr.length > 500 ? 500 : musicArr.length;
         for (let index = 0; index < musicArr.length; index += num) {
+            if (index > 0) {
+                await sleepTime(1000);
+            }
             let arr = [];
             for (let i = 0; i < num; i++) {
                 let obj = musicArr[index + i];
@@ -190,7 +195,7 @@ function getMusicListComment(num, musicArr, req) {
                 console.log(error);
             }
 
-            await sleepTime(100);
+
         }
         console.log(`当前歌单内评论量`, musicsCommentMap);
         resolve(musicsCommentMap);
@@ -205,15 +210,38 @@ function getMusicListComment(num, musicArr, req) {
  */
 function getComment(musicId, req) {
     console.log(`处理歌曲${musicId}`);
+    // /comment/new ? type = 0 & id=1407551413 & sortType=3 & pageSize=1
+
     // 处理歌曲ID
     req.query.id = musicId.toString();
     req.query.limit = '1'
+    req.query.pageSize = '1'
+    req.query.sortType = '3'
+    req.query.type = '0'
     return new Promise((resolve) => {
         let query = Object.assign({}, req.query, req.body, { cookie: req.cookies });
         query.cookie._ntes_nuid = crypto.randomBytes(16).toString("hex");
-        _getMusicComment(query, request).then(
+        _getMusicCommentNew(query, request).then(
             ans => {
-                resolve([musicId, ans.body.total]);
+                console.log("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+                console.log(ans);
+                console.log();
+                console.log(Buffer.from(ans.body));
+                console.log(JSON.parse(ans.body.toString()));
+                console.log(ans.body.data);
+                console.log("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+                try {
+                    // 此处是可能产生例外的语句
+                    const { data: { totalCount } } = JSON.parse(ans.body.toString())
+                    resolve([musicId, totalCount]);
+
+                } catch (error) {
+                    // 此处是负责例外处理的语句
+                    console.log(error);
+                    let totalCount = 0
+                    resolve([musicId, 0]);
+
+                }
             },
             () => {
                 resolve([musicId, 0]);
